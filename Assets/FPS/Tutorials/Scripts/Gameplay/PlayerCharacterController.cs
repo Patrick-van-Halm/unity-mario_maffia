@@ -103,6 +103,7 @@ namespace Unity.FPS.Gameplay
         public bool HasJumpedThisFrame { get; private set; }
         public bool IsDead { get; private set; }
         public bool IsCrouching { get; private set; }
+        public Vector3 ExternalMovement { get; set; }
 
         public float RotationMultiplier
         {
@@ -124,7 +125,11 @@ namespace Unity.FPS.Gameplay
         Actor m_Actor;
         Vector3 m_GroundNormal;
         Vector3 m_CharacterVelocity;
+
+
         Vector3 m_LatestImpactSpeed;
+        Vector3 m_LastParentPos;
+        Transform m_LastParent;
         float m_LastTimeJumped = 0f;
         float m_CameraVerticalAngle = 0f;
         float m_FootstepDistanceCounter;
@@ -172,6 +177,12 @@ namespace Unity.FPS.Gameplay
 
         void Update()
         {
+            if (transform.parent && (!m_LastParent || transform.parent != m_LastParent))
+            {
+                m_LastParent = transform.parent;
+                m_LastParentPos = transform.localPosition;
+            }
+
             // check for Y kill
             if (!IsDead && transform.position.y < KillHeight)
             {
@@ -302,8 +313,10 @@ namespace Unity.FPS.Gameplay
                 // handle grounded movement
                 if (IsGrounded)
                 {
+
                     // calculate the desired velocity from inputs, max speed, and current slope
                     Vector3 targetVelocity = worldspaceMoveInput * MaxSpeedOnGround * speedModifier;
+
                     // reduce speed if crouching by crouch speed ratio
                     if (IsCrouching)
                         targetVelocity *= MaxSpeedCrouchedRatio;
@@ -371,7 +384,9 @@ namespace Unity.FPS.Gameplay
             // apply the final calculated velocity value as a character movement
             Vector3 capsuleBottomBeforeMove = GetCapsuleBottomHemisphere();
             Vector3 capsuleTopBeforeMove = GetCapsuleTopHemisphere(m_Controller.height);
-            m_Controller.Move(CharacterVelocity * Time.deltaTime);
+
+            m_Controller.Move(CharacterVelocity * Time.deltaTime + ExternalMovement);
+            ExternalMovement = Vector3.zero;
 
             // detect obstructions to adjust velocity accordingly
             m_LatestImpactSpeed = Vector3.zero;

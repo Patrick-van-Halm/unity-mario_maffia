@@ -34,6 +34,9 @@ namespace Unity.FPS.Gameplay
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            InvertYAxis = PlayerPrefs.GetInt("InvertYAxis", 0) == 1;
+            InvertXAxis = PlayerPrefs.GetInt("InvertXAxis", 0) == 1;
         }
 
         void LateUpdate()
