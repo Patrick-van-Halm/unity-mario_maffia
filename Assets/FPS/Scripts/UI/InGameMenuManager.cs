@@ -26,6 +26,12 @@ namespace Unity.FPS.UI
         [Tooltip("Toggle component for framerate display")]
         public Toggle FramerateToggle;
 
+        [Tooltip("Toggle component for mouse x inversion")]
+        public Toggle InverseXToggle;
+
+        [Tooltip("Toggle component for mouse y inversion")]
+        public Toggle InverseYToggle;
+
         [Tooltip("GameObject for the controls")]
         public GameObject ControlImage;
 
@@ -58,6 +64,12 @@ namespace Unity.FPS.UI
 
             FramerateToggle.isOn = m_FramerateCounter.UIText.gameObject.activeSelf;
             FramerateToggle.onValueChanged.AddListener(OnFramerateCounterChanged);
+
+            InverseXToggle.isOn = m_PlayerInputsHandler.InvertXAxis;
+            InverseXToggle.onValueChanged.AddListener(OnMouseInversionXChanged);
+
+            InverseYToggle.isOn = m_PlayerInputsHandler.InvertYAxis;
+            InverseYToggle.onValueChanged.AddListener(OnMouseInversionYChanged);
         }
 
         void Update()
@@ -129,6 +141,24 @@ namespace Unity.FPS.UI
         void OnMouseSensitivityChanged(float newValue)
         {
             m_PlayerInputsHandler.LookSensitivity = newValue;
+        }
+
+        void OnMouseInversionXChanged(bool newValue)
+        {
+            m_PlayerInputsHandler.InvertXAxis = newValue;
+            if(newValue)
+                PlayerPrefs.SetInt("InvertXAxis", 1);
+            else
+                PlayerPrefs.SetInt("InvertXAxis", 0);
+        }
+
+        void OnMouseInversionYChanged(bool newValue)
+        {
+            m_PlayerInputsHandler.InvertYAxis = newValue;
+            if (newValue)
+                PlayerPrefs.SetInt("InvertYAxis", 1);
+            else
+                PlayerPrefs.SetInt("InvertYAxis", 0);
         }
 
         void OnShadowsChanged(bool newValue)
